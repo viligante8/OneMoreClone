@@ -5,7 +5,7 @@ public class Ball : MonoBehaviour
     private new Rigidbody2D rigidbody2D;
 
     [SerializeField]
-    private float speed = 100f;
+    private float speed;
 
     private void Awake()
     {

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -27,5 +28,11 @@ public class Block : MonoBehaviour
             UpdateVisualState();
         else
             Destroy(gameObject);
+    }
+
+    internal void SetHits(int hits)
+    {
+        hitsRemaining = hits;
+        UpdateVisualState();
     }
 }

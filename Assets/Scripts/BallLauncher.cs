@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,16 +6,30 @@ public class BallLauncher : MonoBehaviour
 {
     private Vector3 mouseStartpoint, mouseEndpoint;
     private LaunchPreview launchPreview;
+    private List<Ball> balls = new List<Ball>();
+    private int ballsReady;
 
     [SerializeField]
-    private GameObject ballPrefab;
+    private Ball ballPrefab;
+    private BlockSpawner blockSpawner;
 
     private void Awake()
     {
+        blockSpawner = FindObjectOfType<BlockSpawner>();
         launchPreview = GetComponent<LaunchPreview>();
+        CreateBall();
     }
 
-    void Update()
+    public void ReturnBall()
+    {
+        if(++ballsReady == balls.Count)
+        {
+            blockSpawner.SpawnNewRow();
+            CreateBall();
+        }
+    }
+
+    private void Update()
     {
         var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         worldPosition.z = 0;
@@ -35,13 +48,10 @@ public class BallLauncher : MonoBehaviour
         }
     }
 
-    private void EndDrag()
+    private void StartDrag(Vector3 worldPosition)
     {
-        var direction = Vector3.Normalize(mouseEndpoint - mouseStartpoint);
-
-        var ball = Instantiate(ballPrefab, transform.position, Quaternion.identity);
-        ball.GetComponent<Rigidbody2D>().AddForce(-direction * 1000f);
-        launchPreview.Clear();
+        mouseStartpoint = worldPosition;
+        launchPreview.SetStartPoint(transform.position);
     }
 
     private void ContinueDrag(Vector3 worldPosition)
@@ -52,9 +62,32 @@ public class BallLauncher : MonoBehaviour
         launchPreview.SetEndPoint(transform.position - direction);
     }
 
-    private void StartDrag(Vector3 worldPosition)
+    private void EndDrag()
     {
-        mouseStartpoint = worldPosition;
-        launchPreview.SetStartPoint(transform.position);
+        StartCoroutine(LaunchBalls());
+    }
+
+    private IEnumerator LaunchBalls()
+    {
+        var direction = Vector3.Normalize(mouseEndpoint - mouseStartpoint);
+        launchPreview.Clear();
+
+        foreach (var ball in balls)
+        {
+            ball.transform.position = transform.position;
+            ball.gameObject.SetActive(true);
+            ball.GetComponent<Rigidbody2D>().AddForce(-direction * 100f);
+
+            yield return new WaitForSeconds(0.1f);
+        }
+        ballsReady = 0;
+    }
+
+    private void CreateBall()
+    {
+        var ball = Instantiate(ballPrefab);
+        balls.Add(ball);
+
+        ballsReady++;
     }
 }
