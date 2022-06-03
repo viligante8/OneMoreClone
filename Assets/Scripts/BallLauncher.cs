@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,11 +14,15 @@ public class BallLauncher : MonoBehaviour
     private Ball ballPrefab;
     private BlockSpawner blockSpawner;
 
+    internal void SetNewStartPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
+
     private void Awake()
     {
         blockSpawner = FindObjectOfType<BlockSpawner>();
         launchPreview = GetComponent<LaunchPreview>();
-        CreateBall();
     }
 
     public void ReturnBall()
@@ -25,7 +30,6 @@ public class BallLauncher : MonoBehaviour
         if(++ballsReady == balls.Count)
         {
             blockSpawner.SpawnNewRow();
-            CreateBall();
         }
     }
 
@@ -64,6 +68,7 @@ public class BallLauncher : MonoBehaviour
 
     private void EndDrag()
     {
+        CreateBall();
         StartCoroutine(LaunchBalls());
     }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class BallReturn : MonoBehaviour
 {
     private BallLauncher ballLauncher;
+    //private bool firstBallReturned = false;
 
     private void Awake()
     {
@@ -15,5 +16,12 @@ public class BallReturn : MonoBehaviour
     {
         ballLauncher.ReturnBall();
         collision.collider.gameObject.SetActive(false);
+        //Destroy(collision.collider.gameObject);
+
+        ballLauncher.SetNewStartPosition(collision.collider.transform.position);
+        //if(!firstBallReturned)
+        //{
+        //    firstBallReturned = true;
+        //}
     }
 }
